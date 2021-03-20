@@ -10,8 +10,8 @@ const locations = ['ballston', 'fairfax', 'springfield', 'vienna', 'falls-church
  * Scrape to find all image urls that I can from Taco Bamba
  */
 async function loadImgs(){
-    locations.forEach(location => {
-        pupeteer.launch({
+    locations.forEach(async location => {
+        await pupeteer.launch({
             args: [ '--no-sandbox', '--disable-setuid-sandbox' ],
             headless: true
         }).then(async browser => {
