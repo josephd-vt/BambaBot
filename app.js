@@ -9,27 +9,33 @@ const locations = ['ballston', 'fairfax', 'springfield', 'vienna', 'falls-church
 /**
  * Scrape to find all image urls that I can from Taco Bamba
  */
-locations.forEach(location => {
-    pupeteer.launch({
-        args: [ '--no-sandbox', '--disable-setuid-sandbox' ],
-        headless: true
-    }).then(async browser => {
-        const page = await browser.newPage();
-        await page.goto('https://www.tacobamba.com/gallery/' + location);
-        await page.waitForSelector('body');
-        let grabImageUrls = await page.evaluate(() => {
-            let allImages = document.body.getElementsByClassName('card__btn');
-            let scrape = [];
-            for (let key in allImages) {
-                let image = allImages[key].href;
-                if (image) scrape.push(image.substr(0, image.indexOf('.jpg') + 4,));
-            }
-            return {"images": scrape};
+async function loadImgs(){
+    locations.forEach(location => {
+        pupeteer.launch({
+            args: [ '--no-sandbox', '--disable-setuid-sandbox' ],
+            headless: true
+        }).then(async browser => {
+            const page = await browser.newPage();
+            await page.goto('https://www.tacobamba.com/gallery/' + location);
+            await page.waitForSelector('body');
+            let grabImageUrls = await page.evaluate(() => {
+                let allImages = document.body.getElementsByClassName('card__btn');
+                let scrape = [];
+                for (let key in allImages) {
+                    let image = allImages[key].href;
+                    if (image) scrape.push(image.substr(0, image.indexOf('.jpg') + 4,));
+                }
+                return {"images": scrape};
+            });
+            console.log(grabImageUrls);
+            imgs.push.apply(imgs, grabImageUrls["images"]);
+            await browser.close();
         });
-        imgs.push.apply(imgs, grabImageUrls["images"]);
-        await browser.close();
     });
-});
+}
+
+loadImgs();
+
 
 /**
  *
