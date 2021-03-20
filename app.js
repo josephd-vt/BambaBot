@@ -10,7 +10,12 @@ const locations = ['ballston', 'fairfax', 'springfield', 'vienna', 'falls-church
  * Scrape to find all image urls that I can from Taco Bamba
  */
 locations.forEach(location => {
-    pupeteer.launch().then(async browser => {
+    pupeteer.launch({
+        'args': [
+            '--no-sandbox',
+            '--disable-setuid-sandbox'
+        ]
+    }).then(async browser => {
         const page = await browser.newPage();
         await page.goto('https://www.tacobamba.com/gallery/' + location);
         await page.waitForSelector('body');
@@ -22,25 +27,28 @@ locations.forEach(location => {
                 let image = allImages[key].href;
                 if (image) scrape.push(image.substr(0, image.indexOf('.jpg') + 4,));
             }
-            /*allImages.forEach(image =>{
-               let url = image.style;
-               console.log(url);
-               scape.push(url);
-            });*/
             return {"images": scrape};
         });
-        //console.log(grabImageUrls);
         imgs.push.apply(imgs, grabImageUrls["images"]);
         await browser.close();
     });
 });
 
-
+/**
+ *
+ * Discord launch connect and launch discord app
+ * @type {module:"discord.js".Client}
+ */
 const client = new discord.Client();
 client.login(process.env.BOT_TOKEN);
 client.on('message', (msg) => {
-    if (msg.content.toLowerCase().includes('taco')){
+    const content = msg.content.toLowerCase()
+    if (content.includes('taco') && !msg.author.bot){
+        const tacoIdx = content.indexOf("taco");
+        console.log(tacoIdx);
+        const searchString = msg.content.substr(tacoIdx, 4);
+        const value = msg.content.replace(searchString, "__**" + searchString+ "**__")
         const idx = Math.floor(Math.random()*(imgs.length+1));
-        msg.reply("I see you are interested in some Tacos, have you tried Taco Bamba Taqueria!", {files: [imgs[idx]]});
+        if(imgs.length > 0) msg.reply(value+  "? Have you tried Taco Bamba Taqueria?", {files: [imgs[idx]]});
     }
 });
