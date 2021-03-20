@@ -11,17 +11,14 @@ const locations = ['ballston', 'fairfax', 'springfield', 'vienna', 'falls-church
  */
 locations.forEach(location => {
     pupeteer.launch({
-        'args': [
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]
+        args: [ '--no-sandbox', '--disable-setuid-sandbox' ],
+        headless: true
     }).then(async browser => {
         const page = await browser.newPage();
         await page.goto('https://www.tacobamba.com/gallery/' + location);
         await page.waitForSelector('body');
         let grabImageUrls = await page.evaluate(() => {
             let allImages = document.body.getElementsByClassName('card__btn');
-            console.log(allImages);
             let scrape = [];
             for (let key in allImages) {
                 let image = allImages[key].href;
