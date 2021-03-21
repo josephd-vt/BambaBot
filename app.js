@@ -13,7 +13,7 @@ const locations = ['ballston', 'fairfax', 'springfield', 'vienna', 'falls-church
  * Scrape to find all image urls that I can from Taco Bamba
  */
 async function loadImgs() {
-    locations.forEach(async location => {
+    await locations.forEach(async location => {
         await pupeteer.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
             headless: true
@@ -37,7 +37,7 @@ async function loadImgs() {
 }
 
 async function loadMenu() {
-    return await pupeteer.launch({
+    await pupeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         headless: true
     }).then(async browser => {
@@ -64,9 +64,6 @@ async function loadMenu() {
     });
 }
 
-loadImgs();
-
-
 /**
  *
  * Discord launch connect and launch discord app
@@ -75,21 +72,21 @@ loadImgs();
 const client = new discord.Client();
 client.login(process.env.BOT_TOKEN);
 
-loadMenu().then(() => {
+loadImgs().then(loadMenu().then(()=>{
     setInterval(()=>{
         const idx = Math.floor(Math.random() * (menuItems.length + 1));
         client.user.setActivity("customers enjoy a " + menuItems[idx], {type: "WATCHING"})
     }, 300000);
-;
-});
-client.on('message', (msg) => {
-    const content = msg.content.toLowerCase()
-    if (content.includes('taco') && !msg.author.bot) {
-        const tacoIdx = content.indexOf("taco");
-        console.log(tacoIdx);
-        const searchString = msg.content.substr(tacoIdx, 4);
-        const value = msg.content.replace(searchString, "__**" + searchString + "**__")
-        const idx = Math.floor(Math.random() * (imgs.length + 1));
-        if (imgs.length > 0) msg.reply(value + "? Have you tried Taco Bamba Taqueria?", {files: [imgs[idx]]});
-    }
-});
+    client.on('message', (msg) => {
+        const content = msg.content.toLowerCase()
+        if (content.includes('taco') && !msg.author.bot) {
+            const tacoIdx = content.indexOf("taco");
+            console.log(tacoIdx);
+            const searchString = msg.content.substr(tacoIdx, 4);
+            const value = msg.content.replace(searchString, "__**" + searchString + "**__")
+            const idx = Math.floor(Math.random() * (imgs.length + 1));
+            if (imgs.length > 0) msg.reply(value + "? Have you tried Taco Bamba Taqueria?", {files: [imgs[idx]]});
+        }
+    });
+}));
+
