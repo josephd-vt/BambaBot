@@ -73,9 +73,11 @@ const client = new discord.Client();
 client.login(process.env.BOT_TOKEN);
 
 loadImgs().then(loadMenu().then(()=>{
+    const idx = Math.floor(Math.random() * (menuItems.length + 1));
+    client.user.setActivity("customers enjoy a " + menuItems[idx], {type: "WATCHING"});
     setInterval(()=>{
         const idx = Math.floor(Math.random() * (menuItems.length + 1));
-        client.user.setActivity("customers enjoy a " + menuItems[idx], {type: "WATCHING"})
+        client.user.setActivity("customers enjoy a " + menuItems[idx], {type: "WATCHING"});
     }, 300000);
     client.on('message', (msg) => {
         const content = msg.content.toLowerCase()
