@@ -1,5 +1,5 @@
 require('dotenv').config();
-const app = require('axios');
+const axios = require('axios');
 const cheerio = require('cheerio');
 const discord = require('discord.js');
 
@@ -25,7 +25,7 @@ let victorImg = '';
  * @returns {Promise<void>}
  */
 async function loadImages() {
-    const htmlData = (await app.get(baseUrl + "/gallery/")).data;
+    const htmlData = (await axios.get(baseUrl + "/gallery/")).data;
     const $ = await cheerio.load(htmlData);
     const locations = $('.card__btn'); //search for locations
     const locs = []
@@ -33,7 +33,7 @@ async function loadImages() {
         locs[i] = $(e).attr('href');
     });
     for (const loc of locs) {
-        const data = await app.get(baseUrl + loc);
+        const data = await axios.get(baseUrl + loc);
         const $ = cheerio.load(data.data);
         const locations = $('.card__btn');
         await locations.each((i, e) => {
@@ -49,7 +49,7 @@ async function loadImages() {
  * @returns {Promise<void>}
  */
 async function loadMenu() {
-    const htmlData = await app.get(baseUrl + "/menus/");
+    const htmlData = await axios.get(baseUrl + "/menus/");
     const $ = await cheerio.load(htmlData.data);
     const items = $('.menu-item__heading');
     await items.each((i, e) => {
@@ -69,7 +69,7 @@ async function loadMenu() {
  * @returns {Promise<void>}
  */
 async function loadAbout() {
-    const htmlData = await app.get(baseUrl + "/team-member/victor-albisu");
+    const htmlData = await axios.get(baseUrl + "/team-member/victor-albisu");
     const $ = await cheerio.load(htmlData.data);
     const aboutMe = $('.content');
     await aboutMe.each((i, e) => {
