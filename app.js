@@ -3,6 +3,14 @@ const app = require('axios');
 const cheerio = require('cheerio');
 const discord = require('discord.js');
 
+const express = require('express');
+
+const app = express();
+
+app.listen(process.env.PORT || 3000, function(){ //bind to port
+    console.log("started server successfully");
+});
+
 
 const baseUrl = 'https://www.tacobamba.com';
 let imgs = [];
@@ -10,6 +18,7 @@ let menu = new Set();
 
 let aboutVictor = '! Are you talking about our Chef and Owner, Victor Albisu?';
 let victorImg = '';
+
 
 /**
  * More lightweight than puppeteer for web scraping Taco Bamba
@@ -55,6 +64,10 @@ async function loadMenu() {
     menu = Array.from(menu);
 }
 
+/**
+ * Load the about page for Victor Albisu
+ * @returns {Promise<void>}
+ */
 async function loadAbout() {
     const htmlData = await app.get(baseUrl + "/team-member/victor-albisu");
     const $ = await cheerio.load(htmlData.data);
@@ -74,10 +87,24 @@ async function loadAbout() {
     });
 }
 
+/**
+ *
+ * Set discord status to be some menu item from taco bamba
+ * @param client
+ * @returns {Promise<Presence>}
+ */
 function setStatus(client) {
     const menuIdx = Math.floor(Math.random() * menu.length);
     return client.user.setActivity("customers enjoy their " + menu[menuIdx], {type: "WATCHING"});
 }
+
+function byKeyword(content, searchTerm){
+    const lower = content.toLowerCase();
+    const idx = lower.indexOf(searchTerm);
+    if(idx == -1) return null;
+
+}
+
 
 const client = new discord.Client();
 client.login(process.env.BOT_TOKEN);
